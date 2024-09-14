@@ -64,7 +64,7 @@ https://your-worker-domain.com/short-link
 ## Setup Instructions
 
 1. Deploy this Cloudflare Worker script.
-2. Create a KV namespace called `LINKS`.
+2. Create a KV namespace called `LINKS`,link it to your worker.
 3. Add shortened URL mappings (as demonstrated in the example above) in the format:
    ```
    targetUrl,imageUrl,title,description
