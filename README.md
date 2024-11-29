@@ -14,7 +14,7 @@ This project is a simple URL shortener built using Cloudflare Workers. It allows
    - It checks the KV namespace for the path.
    - If the URL is found, the Worker will:
      - For social media bots (like Facebook or Twitter), generate an HTML page with OG tags for rich previews.
-     - For regular browsers, perform a `301` redirect to the original target URL.
+     - Per regular browsers, redirect a `301` URL to the original target URL.
    - If no URL is found for the path, it returns a `404 Not Found` response.
 
 2. The script only allows `GET` requests. Other HTTP methods will return a `405 Method Not Allowed` response.
@@ -25,25 +25,13 @@ This project is a simple URL shortener built using Cloudflare Workers. It allows
 
 In your Cloudflare KV namespace (`LINKS`), add the following key-value pair:
 
-**Key:** `short-link`
-
-**Value:**  
-```
-https://www.example.com/long-url.jpg,https://www.example.com/image.jpg,Example Title,This is an example description.
-```
-
-- **`https://www.example.com/long-url.jpg`**: The URL where the user will be redirected.
-- **`https://www.example.com/image.jpg`**: The image to be shown in social media previews.
-- **`Example Title`**: The title for the preview.
-- **`This is an example description.`**: The description for the preview.
-
 ### 2. Shortened URL
 
 Once the KV is set up, visiting the following shortened URL will trigger the Worker:
 
 **Shortened URL:**  
 ```
-https://your-worker-domain.com/short-link
+https://your-domain/short-link
 ```
 
 - **When accessed via a regular browser**:  
@@ -52,7 +40,6 @@ https://your-worker-domain.com/short-link
 - **When accessed by social media bots (e.g., Facebook or Twitter)**:  
   A preview will be generated with:
   - **Title:** `Example Title`
-  - **Description:** `This is an example description.`
   - **Image:** `https://www.example.com/image.jpg`
 
 ### Example Redirect
@@ -64,10 +51,11 @@ https://your-worker-domain.com/short-link
 ## Setup Instructions
 
 1. Deploy this Cloudflare Worker script.
-2. Create a KV namespace called `LINKS`,link it to your worker.
-3. Add shortened URL mappings (as demonstrated in the example above) in the format:
+2. Create a KV namespace called `LINKS`, and link it to your worker.
+3. Set your Domain.
    ```
-   targetUrl,imageUrl,title,description
+// Domain configuration
+const DOMAIN = '';
    ```
 
 4. Update your Worker script to use the `LINKS` KV namespace.
