@@ -1,8 +1,11 @@
+// Domain configuration
+const DOMAIN = '';
+
 export default {
   async fetch(request, env) {
-    const LINKS = env.LINKS
-    const url = new URL(request.url)
-    const path = url.pathname.slice(1)
+    const LINKS = env.LINKS;
+    const url = new URL(request.url);
+    const path = url.pathname.slice(1);
     
     if (request.method === 'GET') {
       if (path === '') {
@@ -116,7 +119,7 @@ export default {
       await LINKS.put(shortPath, value)
       
       return new Response(JSON.stringify({
-        shortUrl: `https://l.danielmind.tech/${shortPath}`,
+        shortUrl: `https://${DOMAIN}/${shortPath}`,
         path: shortPath
       }), {
         headers: { 'Content-Type': 'application/json' }
@@ -198,6 +201,7 @@ function generateMetaTags(url, image, title) {
 
 // Updated detail page HTML generator with homepage styles
 function generateDetailHTML(key, url, image, title) {
+  // Replace all hardcoded domains with ${DOMAIN}
   return `
     <!DOCTYPE html>
     <html>
@@ -385,9 +389,9 @@ function generateDetailHTML(key, url, image, title) {
             ${image ? `<img src="${image}" alt="${title}">` : ''}
             <h1>${title}</h1>
             <p><strong>Original URL:</strong> <a href="${url}" target="_blank">${url}</a></p>
-            <p><strong>Short URL:</strong> <a href="https://l.danielmind.tech/${key}" target="_blank">https://l.danielmind.tech/${key}</a></p>
+            <p><strong>Short URL:</strong> <a href="https://${DOMAIN}/${key}" target="_blank">https://${DOMAIN}/${key}</a></p>
             <div class="button-group">
-              <button class="copy-btn" onclick="copyToClipboard('https://l.danielmind.tech/${key}')">
+              <button class="copy-btn" onclick="copyToClipboard('https://${DOMAIN}/${key}')">
                 <span class="material-icons">content_copy</span>
                 Copy Short URL
               </button>
@@ -704,19 +708,19 @@ function generateHTML() {
       </head>
       <body>
         <div class="container">
-          <h1>URL 短链接生成器</h1>
+          <h1>URL Shortener</h1>
           
           <form id="shortener-form">
             <div class="form-group">
               <div class="input-group">
-                <input type="url" id="url" placeholder="输入您要缩短的链接" required>
-                <input type="text" id="custom-path" placeholder="自定义路径（可选）">
-                <input type="url" id="image" placeholder="预览图片链接（可选）">
-                <input type="text" id="title" placeholder="链接标题（可选）">
+                <input type="url" id="url" placeholder="Enter URL to shorten" required>
+                <input type="text" id="custom-path" placeholder="Custom path (optional)">
+                <input type="url" id="image" placeholder="Preview image URL (optional)">
+                <input type="text" id="title" placeholder="Link title (optional)">
               </div>
               <button type="submit">
                 <span class="material-icons">link</span>
-                生成短链接
+                Shorten URL
               </button>
             </div>
           </form>
@@ -725,8 +729,8 @@ function generateHTML() {
             <table id="links-table">
               <thead>
                 <tr>
-                  <th>链接</th>
-                  <th>操作</th>
+                  <th>Link</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -744,6 +748,9 @@ function generateHTML() {
         </div>
 
         <script>
+          let currentPage = 1;
+          let totalPages = 1;
+
           async function loadLinks(page = 1) {
             const tbody = document.querySelector('#links-table tbody');
             tbody.classList.add('loading');
@@ -755,13 +762,13 @@ function generateHTML() {
               
               data.links.forEach(link => {
                 const row = document.createElement('tr');
-                const shortUrl = \`https://l.danielmind.tech/\${link.key}\`;
+                const shortUrl = \`https://${DOMAIN}/\${link.key}\`;
                 const image = link.image || 'https://via.placeholder.com/60';
 
                 row.innerHTML = \`
                   <td>
                     <div class="link-row">
-                      <img src="\${image}" alt="缩略图" class="thumbnail">
+                      <img src="\${image}" alt="Thumbnail" class="thumbnail">
                       <a href="/view/\${link.key}" class="link-title">
                         \${link.title || link.url}
                       </a>
@@ -771,11 +778,9 @@ function generateHTML() {
                     <div style="display:flex;gap:8px;">
                       <button class="copy-btn" onclick="copyToClipboard('\${shortUrl}')">
                         <span class="material-icons">content_copy</span>
-                        复制
                       </button>
                       <button class="delete-btn" onclick="deleteLink('\${link.key}')">
                         <span class="material-icons">delete</span>
-                        删除
                       </button>
                     </div>
                   </td>
@@ -787,20 +792,20 @@ function generateHTML() {
               totalPages = data.pagination.totalPages;
               updatePaginationControls();
             } catch (err) {
-              console.error('加载链接时出错:', err);
+              console.error('Error loading links:', err);
             } finally {
               tbody.classList.remove('loading');
             }
           }
 
           async function deleteLink(key) {
-            if (!confirm('确定要删除此链接吗？')) return;
+            if (!confirm('Are you sure you want to delete this link?')) return;
             try {
               await fetch(\`/api/links/\${key}\`, { method: 'DELETE' });
               await loadLinks();
-              showToast('链接已成功删除！');
+              showToast('Link deleted successfully!');
             } catch (err) {
-              alert('删除链接时出错: ' + err.message);
+              alert('Error deleting link: ' + err.message);
             }
           }
 
@@ -817,8 +822,8 @@ function generateHTML() {
 
           function copyToClipboard(text) {
             navigator.clipboard.writeText(text)
-              .then(() => showToast('已复制到剪贴板！'))
-              .catch(err => console.error('复制失败:', err));
+              .then(() => showToast('Copied to clipboard!'))
+              .catch(err => console.error('Failed to copy:', err));
           }
 
           function updatePaginationControls() {
@@ -859,11 +864,11 @@ function generateHTML() {
               });
 
               const result = await response.json();
-              showToast('短链接生成成功！');
+              showToast('Short URL created successfully!');
               await loadLinks();
               form.reset();
             } catch (err) {
-              alert('生成短链接时出错: ' + err.message);
+              alert('Error creating short URL: ' + err.message);
             } finally {
               form.classList.remove('loading');
             }
