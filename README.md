@@ -1,6 +1,6 @@
 # URL Shortener with Cloudflare Workers
 
-This project is a simple URL shortener built using Cloudflare Workers. It allows for shortening long URLs and providing rich previews for social media sharing.
+This project is a simple URL shortener built using Cloudflare Workers. It shortens long URLs and provides rich social media sharing previews.
 
 ## Features
 
@@ -23,7 +23,7 @@ This project is a simple URL shortener built using Cloudflare Workers. It allows
 
 ### 1. KV Key-Value Setup
 
-In your Cloudflare KV namespace (`LINKS`), add the following key-value pair:
+In your Cloudflare KV namespace (`LINKS`).
 
 ### 2. Shortened URL
 
@@ -53,9 +53,9 @@ https://your-domain/short-link
 1. Deploy this Cloudflare Worker script.
 2. Create a KV namespace called `LINKS`, and link it to your worker.
 3. Set your Domain.
-   ```
+```
 // Domain configuration
 const DOMAIN = '';
-   ```
+```
 
-4. Update your Worker script to use the `LINKS` KV namespace.
+5. Update your Worker script to use the `LINKS` KV namespace.
