@@ -21,9 +21,10 @@ This project is a simple URL shortener built using Cloudflare Workers. It shorte
 
 ## Example
 
-### 1. KV Key-Value Setup
+### 1. KV Key-Value Setup and environment variable
 
-In your Cloudflare KV namespace (`LINKS`).
+- In your Cloudflare KV namespace (`LINKS`).
+- Add an environment variable "PASSWORD" and set the value to your password
 
 ### 2. Shortened URL
 
