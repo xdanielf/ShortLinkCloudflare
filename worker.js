@@ -3,6 +3,31 @@ const DOMAIN = '';
 
 export default {
   async fetch(request, env) {
+    // Password check
+    const authCookie = request.headers.get('Cookie')?.includes('authorized=1');
+    if (!authCookie) {
+      if (request.method === 'POST') {
+        const formData = await request.formData();
+        if (formData.get('password') === env.PASSWORD) {
+          return new Response('Authentication successful! Redirecting...', {
+            status: 303,
+            headers: { 
+              'Set-Cookie': 'authorized=1; Path=/',
+              'Location': '/'
+            },
+          });
+        }
+        return new Response('Incorrect password', { status: 401 });
+      }
+      return new Response(
+        `<form method="POST">
+          <input type="password" name="password" />
+          <button type="submit">Login</button>
+        </form>`,
+        { headers: { 'Content-Type': 'text/html' } }
+      );
+    }
+
     const LINKS = env.LINKS;
     const url = new URL(request.url);
     const path = url.pathname.slice(1);
